@@ -1,7 +1,8 @@
 import { existsSync } from "node:fs";
-import { readdir, writeFile } from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 import { basename, extname, join } from "node:path";
 import sharp from "sharp";
+import { listImageFiles } from "../../shared/image-files.ts";
 
 const EXTENSIONS = ["jpg", "jpeg", "webp"] as const;
 
@@ -21,15 +22,7 @@ export interface ConversionResult {
 
 /** Eligible images directly in `folder` (no subfolders), sorted by name. Other files are never opened. */
 export async function listSources(folder: string): Promise<SourceImage[]> {
-  const entries = await readdir(folder, { withFileTypes: true });
-  const sources: SourceImage[] = [];
-  for (const entry of entries) {
-    if (!entry.isFile()) continue;
-    const ext = extname(entry.name).slice(1).toLowerCase();
-    if (!(EXTENSIONS as readonly string[]).includes(ext)) continue;
-    sources.push({ name: entry.name, path: join(folder, entry.name), ext: ext as SourceImage["ext"] });
-  }
-  return sources.sort((a, b) => a.name.localeCompare(b.name));
+  return (await listImageFiles(folder, EXTENSIONS)) as SourceImage[];
 }
 
 /** Target PNG path for a source: <outDir>/<base name>.png */

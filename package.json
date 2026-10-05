@@ -14,6 +14,7 @@
     "vw": "node src/tools/units/vw.ts",
     "vh": "node src/tools/units/vh.ts",
     "img:png": "node src/tools/image-convert/index.ts",
+    "img:compress": "node src/tools/image-compress/index.ts",
     "build": "vite build",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit"

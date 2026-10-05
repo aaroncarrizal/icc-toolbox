@@ -21,17 +21,17 @@ scenarios in [quickstart.md](quickstart.md), run in the session scratchpad (neve
 
 ## Phase 1: Setup
 
-- [ ] T001 Add script `"img:compress": "node src/tools/image-compress/index.ts"` to `package.json`, right after `img:png`
-- [ ] T002 Create folder `src/tools/image-compress/`
+- [X] T001 Add script `"img:compress": "node src/tools/image-compress/index.ts"` to `package.json`, right after `img:png`
+- [X] T002 Create folder `src/tools/image-compress/`
 
 ---
 
 ## Phase 2: Foundational (shared code)
 
-- [ ] T003 Create `src/shared/image-files.ts` exporting `interface ImageFile { name: string; path: string; ext: string }` and `listImageFiles(folder, extensions: readonly string[])`: regular files directly in `folder` (no subfolders), lower-cased extension in `extensions`, sorted by name — logic moved from `src/tools/image-convert/convert.ts` `listSources` ([research.md](research.md) §6); delete `src/shared/.gitkeep`
-- [ ] T004 Refactor `src/tools/image-convert/convert.ts` `listSources` to call `listImageFiles(folder, ["jpg","jpeg","webp"])` from `../../shared/image-files.ts`, keeping its `SourceImage` type and behavior identical
-- [ ] T005 Run `npm run typecheck`, then img:png quickstart scenarios 1–2 from `specs/002-image-convert/quickstart.md` on a scratchpad fixture — counts must match (5 converted, 1 skipped, 1 failed)
-- [ ] T006 Commit as `refactor: move image file listing to src/shared for reuse by image tools`
+- [X] T003 Create `src/shared/image-files.ts` exporting `interface ImageFile { name: string; path: string; ext: string }` and `listImageFiles(folder, extensions: readonly string[])`: regular files directly in `folder` (no subfolders), lower-cased extension in `extensions`, sorted by name — logic moved from `src/tools/image-convert/convert.ts` `listSources` ([research.md](research.md) §6); delete `src/shared/.gitkeep`
+- [X] T004 Refactor `src/tools/image-convert/convert.ts` `listSources` to call `listImageFiles(folder, ["jpg","jpeg","webp"])` from `../../shared/image-files.ts`, keeping its `SourceImage` type and behavior identical
+- [X] T005 Run `npm run typecheck`, then img:png quickstart scenarios 1–2 from `specs/002-image-convert/quickstart.md` on a scratchpad fixture — counts must match (5 converted, 1 skipped, 1 failed)
+- [X] T006 Commit as `refactor: move image file listing to src/shared for reuse by image tools`
 
 **Checkpoint**: shared helper in place, img:png unchanged.
 
