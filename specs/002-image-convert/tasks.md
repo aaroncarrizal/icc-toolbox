@@ -22,16 +22,16 @@ scratchpad (never in the repo).
 
 ## Phase 1: Setup
 
-- [ ] T001 Add `sharp` (`^0.35.5`) to `dependencies` in `package.json` via `npm install sharp@^0.35.5` (updates `package-lock.json`)
-- [ ] T002 Add script `"img:png": "node src/tools/image-convert/index.ts"` to `package.json`, after the `vh` script
-- [ ] T003 Create folder `src/tools/image-convert/`
+- [X] T001 Add `sharp` (`^0.35.5`) to `dependencies` in `package.json` via `npm install sharp@^0.35.5` (updates `package-lock.json`)
+- [X] T002 Add script `"img:png": "node src/tools/image-convert/index.ts"` to `package.json`, after the `vh` script
+- [X] T003 Create folder `src/tools/image-convert/`
 
 ---
 
 ## Phase 2: Foundational
 
-- [ ] T004 In `src/tools/image-convert/convert.ts` define and export types per [data-model.md](data-model.md): `SourceImage { name: string; path: string; ext: "jpg" | "jpeg" | "webp" }`, `ConversionResult { source; outPath: string; status: "converted" | "skipped" | "failed"; reason?: string; warning?: string }` (string-literal unions, no `enum` — Principle IV)
-- [ ] T005 In `src/tools/image-convert/convert.ts` implement `listSources(folder)`: `readdir(folder, { withFileTypes: true })`, keep only regular files (no subfolders — FR-004b) whose lower-cased extension is `jpg`, `jpeg` or `webp` (FR-002), sorted by name; never open other files (FR-005)
+- [X] T004 In `src/tools/image-convert/convert.ts` define and export types per [data-model.md](data-model.md): `SourceImage { name: string; path: string; ext: "jpg" | "jpeg" | "webp" }`, `ConversionResult { source; outPath: string; status: "converted" | "skipped" | "failed"; reason?: string; warning?: string }` (string-literal unions, no `enum` — Principle IV)
+- [X] T005 In `src/tools/image-convert/convert.ts` implement `listSources(folder)`: `readdir(folder, { withFileTypes: true })`, keep only regular files (no subfolders — FR-004b) whose lower-cased extension is `jpg`, `jpeg` or `webp` (FR-002), sorted by name; never open other files (FR-005)
 
 **Checkpoint**: sources can be listed.
 
@@ -43,12 +43,12 @@ scratchpad (never in the repo).
 
 **Independent Test**: [quickstart.md](quickstart.md) scenarios 1–2 (minus conflict/broken rows), 5, 6, 7, 8.
 
-- [ ] T006 [US1] In `src/tools/image-convert/convert.ts` implement `convertOne(source, outPath)`: `sharp(source.path).rotate()` (auto-orient, research §2), read `metadata().pages` and set `warning: "animated WebP — first frame only"` when `(pages ?? 1) > 1` (research §3), `.png().toBuffer()`, then `writeFile(outPath, buffer)` — buffer first so no partial PNG is ever written (research §5); return a `ConversionResult` with `status: "converted"`
-- [ ] T007 [US1] In `src/tools/image-convert/index.ts` implement the CLI with `node:util` `parseArgs` (`allowPositionals`, options `force`/`f` boolean, `help`/`h` boolean): print usage and exit 0 on `--help`; usage on stderr and exit 1 if the folder is missing or an option is unknown; resolve the folder against cwd and exit 1 with `[img:png] Not a folder: <path>` on stderr if it doesn't exist or isn't a directory ([contracts/cli.md](contracts/cli.md))
-- [ ] T008 [US1] In `src/tools/image-convert/index.ts`: call `listSources`; if empty print `[img:png] No .jpg, .jpeg or .webp files in <abs folder>` and exit 0 without creating `png/`; otherwise `mkdir <folder>/png` (recursive), convert each source sequentially to `png/<base>.png`, print one aligned line per result exactly as in [contracts/cli.md](contracts/cli.md), then the summary line `[img:png] N converted, N skipped, N failed — output: <abs png dir>`
-- [ ] T009 [US1] Run `npm run typecheck` (must exit 0) and the cross-tool import grep from [quickstart.md](quickstart.md) §1 (must print nothing)
-- [ ] T010 [US1] Build the fixture folder from [quickstart.md](quickstart.md) §2 in the session scratchpad with a throwaway sharp script; run scenarios 5–8 and the happy-path parts of 1–2 (a, b, c, rot converted; `c.png` has alpha; `rot.png` is 10×30; originals and `keep.png`/`notes.txt`/`sub/` untouched)
-- [ ] T011 [US1] Commit as `feat: add img:png image converter (jpg/jpeg/webp → png)`
+- [X] T006 [US1] In `src/tools/image-convert/convert.ts` implement `convertOne(source, outPath)`: `sharp(source.path).rotate()` (auto-orient, research §2), read `metadata().pages` and set `warning: "animated WebP — first frame only"` when `(pages ?? 1) > 1` (research §3), `.png().toBuffer()`, then `writeFile(outPath, buffer)` — buffer first so no partial PNG is ever written (research §5); return a `ConversionResult` with `status: "converted"`
+- [X] T007 [US1] In `src/tools/image-convert/index.ts` implement the CLI with `node:util` `parseArgs` (`allowPositionals`, options `force`/`f` boolean, `help`/`h` boolean): print usage and exit 0 on `--help`; usage on stderr and exit 1 if the folder is missing or an option is unknown; resolve the folder against cwd and exit 1 with `[img:png] Not a folder: <path>` on stderr if it doesn't exist or isn't a directory ([contracts/cli.md](contracts/cli.md))
+- [X] T008 [US1] In `src/tools/image-convert/index.ts`: call `listSources`; if empty print `[img:png] No .jpg, .jpeg or .webp files in <abs folder>` and exit 0 without creating `png/`; otherwise `mkdir <folder>/png` (recursive), convert each source sequentially to `png/<base>.png`, print one aligned line per result exactly as in [contracts/cli.md](contracts/cli.md), then the summary line `[img:png] N converted, N skipped, N failed — output: <abs png dir>`
+- [X] T009 [US1] Run `npm run typecheck` (must exit 0) and the cross-tool import grep from [quickstart.md](quickstart.md) §1 (must print nothing)
+- [X] T010 [US1] Build the fixture folder from [quickstart.md](quickstart.md) §2 in the session scratchpad with a throwaway sharp script; run scenarios 5–8 and the happy-path parts of 1–2 (a, b, c, rot converted; `c.png` has alpha; `rot.png` is 10×30; originals and `keep.png`/`notes.txt`/`sub/` untouched)
+- [X] T011 [US1] Commit as `feat: add img:png image converter (jpg/jpeg/webp → png)`
 
 **Checkpoint**: MVP — a folder of images converts in one command.
 

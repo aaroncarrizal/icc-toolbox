@@ -13,6 +13,7 @@
     "clamp": "node src/tools/units/clamp.ts",
     "vw": "node src/tools/units/vw.ts",
     "vh": "node src/tools/units/vh.ts",
+    "img:png": "node src/tools/image-convert/index.ts",
     "build": "vite build",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit"
@@ -28,7 +29,8 @@
   "dependencies": {
     "chokidar": "^4.0.3",
     "commander": "^13.1.0",
-    "fast-glob": "^3.3.3"
+    "fast-glob": "^3.3.3",
+    "sharp": "^0.35.5"
   },
   "devDependencies": {
     "@types/node": "^22.13.10",
