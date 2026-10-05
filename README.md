@@ -1,5 +1,16 @@
 # icc-toolbox
 
+A collection of small CLI tools that speed up ICC dealer-site development. Each tool lives in its own folder under `src/tools/`:
+
+| Tool | Folder | Commands |
+|---|---|---|
+| CSS injector + debug CLI | `src/tools/css-injector/` | `npm run dev`, `npm run css`, `npm run dbg` |
+| px unit converters | `src/tools/units/` | `npm run clamp`, `npm run vw`, `npm run vh` |
+
+Code shared by more than one tool goes in `src/shared/`; a tool never imports from another tool's folder.
+
+## CSS injector
+
 A CLI tool that injects local CSS files into any published website with instant hot reload, and lets you switch individual CSS sources — your own files or the site's own stylesheets — on and off while the page stays open. It launches Chrome directly (no browser-automation framework) and talks to it only through one page's own Chrome DevTools Protocol (CDP) connection, so opening DevTools alongside it never causes trouble.
 
 ## Requirements
@@ -98,4 +109,4 @@ npm start             # run the built version
 - [Chokidar](https://github.com/paulmillr/chokidar) — file watching
 - [Fast Glob](https://github.com/mrmlnc/fast-glob) — file matching
 - [Commander](https://github.com/tj/commander.js) — CLI parsing
-- Chrome DevTools Protocol, via a minimal client in `src/cdp.ts` built on Node's built-in `WebSocket` and `fetch` — no browser-automation dependency
+- Chrome DevTools Protocol, via a minimal client in `src/tools/css-injector/cdp.ts` built on Node's built-in `WebSocket` and `fetch` — no browser-automation dependency

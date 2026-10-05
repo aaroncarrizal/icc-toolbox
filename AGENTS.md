@@ -4,7 +4,14 @@ This file provides context for AI agents working on icc-toolbox (formerly CSS In
 
 ## Project Overview
 
-icc-toolbox is a CLI tool that launches the system's Google Chrome with a dedicated debugging profile, injects local CSS files into a target site's page at document start (before the page's own content paints, so there's no flash of unstyled content), and hot-reloads whenever a CSS file changes on disk. Each local file gets its own `<style>` tag, and both local files and the site's own `<link>` stylesheets can be switched on and off live while the page is open. All of this — the injector, the source toggling and the debug CLI — talks to Chrome only through the **page-level** Chrome DevTools Protocol (CDP): every connection is opened directly to one page's own websocket, never to the browser-level websocket. That's deliberate — see **Rules for working on this tool** below.
+icc-toolbox is a single npm package holding several small CLI tools that speed up the ICC dealer-site dev cycle. Each tool lives in its own folder under `src/tools/` (see **Toolbox Layout** below). Current tools:
+
+| Tool | Folder | Commands |
+|---|---|---|
+| CSS injector + debug CLI | `src/tools/css-injector/` | `dev`, `css`, `dbg`, `build`, `start` |
+| px unit converters | `src/tools/units/` | `clamp`, `vw`, `vh` |
+
+The main tool, the CSS injector, launches the system's Google Chrome with a dedicated debugging profile, injects local CSS files into a target site's page at document start (before the page's own content paints, so there's no flash of unstyled content), and hot-reloads whenever a CSS file changes on disk. Each local file gets its own `<style>` tag, and both local files and the site's own `<link>` stylesheets can be switched on and off live while the page is open. All of this — the injector, the source toggling and the debug CLI — talks to Chrome only through the **page-level** Chrome DevTools Protocol (CDP): every connection is opened directly to one page's own websocket, never to the browser-level websocket. That's deliberate — see **Rules for working on this tool** below.
 
 ## Commands
 
@@ -17,6 +24,22 @@ icc-toolbox is a CLI tool that launches the system's Google Chrome with a dedica
 | `npm run build` | Build with Vite |
 | `npm run typecheck` | TypeScript type checking |
 | `npm start` | Run the built version |
+
+## Toolbox Layout
+
+```
+src/
+├── shared/            # code used by 2+ tools (empty until a second tool needs something)
+└── tools/
+    ├── css-injector/   # injector, `css` and `dbg` CLIs
+    └── units/          # clamp / vw / vh converters
+```
+
+- **One folder per tool**, `src/tools/<name>/` (kebab-case), with its own entry point(s), its own config file if it needs one, and its own section in this file.
+- **A tool may import from `src/shared/` but never from another tool's folder.** If two tools need the same code, move it into `src/shared/` instead of cross-importing.
+- **Existing npm script names are a stable interface** — don't rename them. New tools get namespaced scripts, e.g. `img:png`, `img:compress`.
+- Dealer working files (`styles/`, `scripts/`, `snippets/`, `debug/`, `.cssinjector*.json`) stay at the repo root and belong to the CSS injector.
+- Adding a tool = a new folder under `src/tools/`, a new script in `package.json`, a new section here.
 
 ## Fix Priority
 
@@ -130,29 +153,33 @@ Explain the findings (computed styles, bounding box, visibility, which rule wins
 
 ```
 src/
-├── index.ts        # CLI entry point (commander). Launches/reuses Chrome, connects Cdp to the
-│                    # site tab, sets up basic auth + console/network capture, syncs CSS/JS at
-│                    # document-start, watches styles/, scripts/ (opt-in) and the state file.
-├── config.ts        # Config type, defaults, and .cssinjector.json loading.
-├── chrome.ts         # Finds and spawns the system Chrome with a dedicated --user-data-dir
-│                    # (required: Chrome 136+ ignores the debug port on the default profile),
-│                    # or reuses one already listening on the port.
-├── cdp.ts            # Cdp: a minimal CDP client bound to ONE page's own websocket (never the
-│                    # browser-level websocket) — see Rules below.
-├── injector.ts       # syncCss/syncJs (register + live-apply via Page.addScriptToEvaluateOnNewDocument
-│                    # and Runtime.evaluate), applyViewport, enableBasicAuth (Fetch-based).
-├── page-runtime.ts   # The code that actually runs INSIDE the page: one <style> per local file,
-│                    # link.disabled toggling for remote sheets, a MutationObserver to reassert
-│                    # both against late-inserted site markup.
-├── state.ts          # .cssinjector.state.json (disabledLocal/disabledRemote/viewport) — the
-│                    # single source of truth for live toggling, shared by the injector and CLIs.
-├── sources.ts        # Reads local CSS/JS files as separate {id, content} entries.
-├── watcher.ts         # Generic debounced chokidar watcher.
-├── console-log.ts     # Captures console errors/exceptions/failed requests to debug/console.jsonl.
-├── css-lint.ts        # CSS.supports()-based check for invalid declarations, logged as warnings.
-├── css-cli.ts         # npm run css -- <command>
-├── dbg.ts             # npm run dbg -- <command>
-└── clamp.ts / vw.ts / vh.ts   # Standalone px → clamp()/vw/vh converters.
+├── shared/                    # code used by 2+ tools (currently empty)
+└── tools/
+    ├── css-injector/
+    │   ├── index.ts        # CLI entry point (commander). Launches/reuses Chrome, connects Cdp to the
+    │   │                    # site tab, sets up basic auth + console/network capture, syncs CSS/JS at
+    │   │                    # document-start, watches styles/, scripts/ (opt-in) and the state file.
+    │   ├── config.ts        # Config type, defaults, and .cssinjector.json loading.
+    │   ├── chrome.ts         # Finds and spawns the system Chrome with a dedicated --user-data-dir
+    │   │                    # (required: Chrome 136+ ignores the debug port on the default profile),
+    │   │                    # or reuses one already listening on the port.
+    │   ├── cdp.ts            # Cdp: a minimal CDP client bound to ONE page's own websocket (never the
+    │   │                    # browser-level websocket) — see Rules below.
+    │   ├── injector.ts       # syncCss/syncJs (register + live-apply via Page.addScriptToEvaluateOnNewDocument
+    │   │                    # and Runtime.evaluate), applyViewport, enableBasicAuth (Fetch-based).
+    │   ├── page-runtime.ts   # The code that actually runs INSIDE the page: one <style> per local file,
+    │   │                    # link.disabled toggling for remote sheets, a MutationObserver to reassert
+    │   │                    # both against late-inserted site markup.
+    │   ├── state.ts          # .cssinjector.state.json (disabledLocal/disabledRemote/viewport) — the
+    │   │                    # single source of truth for live toggling, shared by the injector and CLIs.
+    │   ├── sources.ts        # Reads local CSS/JS files as separate {id, content} entries.
+    │   ├── watcher.ts         # Generic debounced chokidar watcher.
+    │   ├── console-log.ts     # Captures console errors/exceptions/failed requests to debug/console.jsonl.
+    │   ├── css-lint.ts        # CSS.supports()-based check for invalid declarations, logged as warnings.
+    │   ├── css-cli.ts         # npm run css -- <command>
+    │   └── dbg.ts             # npm run dbg -- <command>
+    └── units/
+        └── clamp.ts / vw.ts / vh.ts   # Standalone px → clamp()/vw/vh converters.
 ```
 
 ## Config
