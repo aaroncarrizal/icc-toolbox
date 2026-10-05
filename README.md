@@ -11,7 +11,7 @@ A collection of small CLI tools that speed up ICC dealer-site development. Each 
 
 Code shared by more than one tool goes in `src/shared/`; a tool never imports from another tool's folder.
 
-**Branches:** `master` is the toolbox itself. Each dealer gets an independent branch cut from `master` (via `/set-up`) that is never merged back or updated from `master` — it keeps the toolbox version it was created with.
+**Branches:** `master` is the toolbox itself. Each dealer gets an independent branch cut from `master` (via `/set-up`) that is never merged back. It keeps the toolbox version it was created with unless you explicitly rebase it on `master` to pick up newer tools.
 
 ## Image converter
 

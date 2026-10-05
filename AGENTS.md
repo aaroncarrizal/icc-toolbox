@@ -53,8 +53,10 @@ This repo is a toolbox for building, fixing and migrating many **independent** d
 
 - **`master` is the toolbox**: tools, skills, docs. Toolbox changes are made on a feature branch and merged into `master` only.
 - **Each dealer gets its own branch**, cut from `master` by `/set-up`, holding only that dealer's site work (`styles/`, `scripts/`, `.cssinjector.json`).
-- **Dealer branches are never merged** — not into `master`, not into each other, and they don't pull later `master` changes. An existing dealer branch keeps the toolbox version it was cut with; new toolbox features reach a dealer the next time a branch is cut from `master`.
-- Never commit dealer-specific work to `master`, and never suggest merging `master` into a dealer branch.
+- **Dealer branches are never merged** into `master` or into each other.
+- **Updating a dealer branch from `master` happens only when the user asks** (e.g. "rebase sun-city-rv-inc on master"). Don't suggest it or do it on your own — by default a dealer branch keeps the toolbox version it was cut with, and new toolbox features reach a dealer the next time a branch is cut from `master`.
+- When asked: `git rebase master <dealer-branch>` (dealer commits only touch `styles/`, `scripts/`, `snippets/`, `.cssinjector.json`, so it normally applies cleanly). Note the old tip first so it can be restored, and confirm before force-pushing a branch that already has a remote.
+- Never commit dealer-specific work to `master`.
 
 ## Image Converter (`npm run img:png`)
 
