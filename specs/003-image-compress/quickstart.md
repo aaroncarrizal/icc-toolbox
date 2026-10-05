@@ -22,7 +22,7 @@ grep -rnE "from \"\.\./" src/tools/    # only "../../shared/..." imports allowed
 | `pic.webp` large, > 1 MB | WebP ladder |
 | `small.png` < 1 MB | copied byte-for-byte |
 | `rot.jpg` small, EXIF orientation 6 | copied (orientation flag kept) |
-| `IMPOSSIBLE.JPG` 1000×1000 pure noise, > 1 MB at q60 | upper-case ext; hits floors → failed |
+| `IMPOSSIBLE.JPG` 1000×1000 pure noise, ~1.5 MB | upper-case ext; fits 1 MB at q85, but with `--max 100KB` hits both floors → failed |
 | `broken.jpg` (text bytes) | failed |
 | `notes.txt`, `sub/x.jpg` | ignored |
 
@@ -30,9 +30,10 @@ grep -rnE "from \"\.\./" src/tools/    # only "../../shared/..." imports allowed
 
 | # | Command | Expected |
 |---|---|---|
-| 1 | `npm run img:compress -- <f>` | photo/easy/graphic/pic compressed, small/rot copied, IMPOSSIBLE + broken failed; every file in `compressed/` ≤ 1,000,000 B; exit 1 |
-| 2 | inspect | `graphic.png` output has alpha; `small.png`/`rot.jpg` byte-identical to source; originals unchanged (size+mtime); no `sub/compressed`, no `IMPOSSIBLE.JPG`/`broken.jpg` in `compressed/` |
-| 3 | run #1 again | all previously written files skipped; same 2 failed; no output mtime changes |
+| 1 | `npm run img:compress -- <f>` | photo/easy/graphic/pic/IMPOSSIBLE compressed, small/rot copied, broken failed; every file in `compressed/` ≤ 1,000,000 B; exit 1 |
+| 2 | inspect | `graphic.png` output has alpha; `small.png`/`rot.jpg` byte-identical to source; originals unchanged (size+mtime); no `sub/compressed`, no `broken.jpg` in `compressed/` |
+| 3 | run #1 again | all previously written files skipped; broken still failed; no output mtime changes |
+| 3b | `IMPOSSIBLE.JPG` + `easy.jpg` alone, `--max 100KB` | easy compressed; IMPOSSIBLE failed with `can't reach 100 KB at quality 60 / 1000px (best: …)`; nothing written for it; exit 1 |
 | 4 | `--force --max 500KB` | every output ≤ 500,000 B or failed |
 | 5 | `--force --max-width 1920` | photo/easy/graphic/pic outputs ≤ 1920 px wide; small files narrower than 1920 still copied |
 | 6 | empty folder | "No .jpg, .jpeg, .webp or .png files", exit 0, no `compressed/` |

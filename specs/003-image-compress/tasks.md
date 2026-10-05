@@ -63,10 +63,10 @@ scenarios in [quickstart.md](quickstart.md), run in the session scratchpad (neve
 
 **Independent Test**: [quickstart.md](quickstart.md) scenarios 1 and 3 in full.
 
-- [ ] T016 [US2] In `src/tools/image-compress/index.ts` before processing: `compressed/<name>` exists and `!force` → `skipped` with `reason: "already exists — use --force to overwrite"`; only create `compressed/` if at least one file will be processed
-- [ ] T017 [US2] In `src/tools/image-compress/index.ts` wrap each `compressOne` in try/catch → `failed` with the error message (FR-008), keep going; `process.exitCode = 1` if any failed
-- [ ] T018 [US2] Run `npm run typecheck`, then [quickstart.md](quickstart.md) scenarios 1 and 3 in full (broken.jpg and the impossible file fail, nothing written for them; re-run skips everything else with no mtime changes)
-- [ ] T019 [US2] Commit as `feat(img:compress): skip existing output, --force, isolate failures`
+- [X] T016 [US2] In `src/tools/image-compress/index.ts` before processing: `compressed/<name>` exists and `!force` → `skipped` with `reason: "already exists — use --force to overwrite"`; only create `compressed/` if at least one file will be processed
+- [X] T017 [US2] In `src/tools/image-compress/index.ts` wrap each `compressOne` in try/catch → `failed` with the error message (FR-008), keep going; `process.exitCode = 1` if any failed
+- [X] T018 [US2] Run `npm run typecheck`, then [quickstart.md](quickstart.md) scenarios 1 and 3 in full (broken.jpg and the impossible file fail, nothing written for them; re-run skips everything else with no mtime changes)
+- [X] T019 [US2] Commit as `feat(img:compress): skip existing output, --force, isolate failures`
 
 ---
 

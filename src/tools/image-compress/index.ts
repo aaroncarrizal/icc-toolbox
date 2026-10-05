@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { mkdir, stat } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
@@ -95,12 +96,25 @@ if (files.length === 0) {
 }
 
 const outDir = join(folder, "compressed");
-await mkdir(outDir, { recursive: true });
+const plan = files.map((file) => {
+  const outPath = join(outDir, file.name);
+  return { file, outPath, exists: !force && existsSync(outPath) };
+});
+if (plan.some((p) => !p.exists)) await mkdir(outDir, { recursive: true });
 
 const width = Math.max(...files.map((f) => f.name.length));
 const results: CompressionResult[] = [];
-for (const file of files) {
-  const result = await compressOne(file, join(outDir, file.name), { limit, maxWidth });
+for (const { file, outPath, exists } of plan) {
+  let result: CompressionResult;
+  if (exists) {
+    result = { source: file, outPath, status: "skipped", reason: "already exists — use --force to overwrite" };
+  } else {
+    try {
+      result = await compressOne(file, outPath, { limit, maxWidth });
+    } catch (err) {
+      result = { source: file, outPath, status: "failed", reason: (err as Error).message };
+    }
+  }
   results.push(result);
   console.log(formatResult(result, width));
 }
@@ -114,3 +128,4 @@ console.log(
   `${TAG} ${count("compressed")} compressed, ${count("copied")} copied, ${count("skipped")} skipped, ${count("failed")} failed` +
     ` — ${formatBytes(before)} -> ${formatBytes(after)} (saved ${formatBytes(before - after)}, ${pct}%) — output: ${outDir}`,
 );
+if (count("failed") > 0) process.exitCode = 1;
