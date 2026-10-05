@@ -1,19 +1,3 @@
-<!--
-Sync Impact Report
-- Version change: (template, unversioned) → 1.0.0
-- Modified principles: all placeholders replaced (initial ratification)
-  - [PRINCIPLE_1_NAME] → I. Tool Isolation
-  - [PRINCIPLE_2_NAME] → II. CLI-First via npm Scripts
-  - [PRINCIPLE_3_NAME] → III. Page-Level CDP Only
-  - [PRINCIPLE_4_NAME] → IV. Erasable TypeScript, No Build Step
-  - [PRINCIPLE_5_NAME] → V. Simplicity and Minimal Dependencies
-- Added sections: Dealer-Site Work Constraints, Development Workflow, Governance
-- Removed sections: none
-- Templates: plan-template.md / spec-template.md / tasks-template.md read the constitution at
-  runtime via the Constitution Check gate — no edits required
-- Follow-up TODOs: none
--->
-
 # icc-toolbox Constitution
 
 ## Core Principles
