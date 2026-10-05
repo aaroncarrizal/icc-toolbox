@@ -14,12 +14,37 @@ Code shared by more than one tool goes in `src/shared/`; a tool never imports fr
 
 ## Image converter
 
+Converts `.jpg`, `.jpeg` and `.webp` images to `.png` — for dealer sites that need PNG uploads.
+
 ```bash
-npm run img:png -- ./path/to/images           # .jpg/.jpeg/.webp → ./path/to/images/png/*.png
-npm run img:png -- ./path/to/images --force   # overwrite PNGs that already exist
+npm run img:png -- <folder>            # convert
+npm run img:png -- <folder> --force    # also overwrite PNGs that already exist
+npm run img:png -- --help              # usage
 ```
 
-Originals are kept; only files directly in the folder are converted.
+`<folder>` is relative to the project root, or absolute, e.g. `npm run img:png -- "C:/Users/me/Downloads/campsite-photos"`:
+
+```text
+[img:png] converted  a.jpg       -> png/a.png
+[img:png] converted  banner.webp -> png/banner.png
+[img:png] skipped    logo.webp   (name conflict with logo.jpg)
+[img:png] failed     broken.jpg  (Input file contains unsupported image format)
+[img:png] 2 converted, 1 skipped, 1 failed — output: C:UsersmeDownloadscampsite-photospng
+```
+
+| Rule | Detail |
+|---|---|
+| Which files | `.jpg`, `.jpeg`, `.webp` in any letter case, **directly** in `<folder>`. Subfolders (including `png/`) aren't scanned; every other file is ignored. |
+| Output | `<folder>/png/<same name>.png` — `png/` is created only if something gets written. |
+| Originals | Never modified, moved or deleted. |
+| Image quality | Same size as the source, WebP transparency kept, JPEG rotation applied so phone photos aren't sideways. Camera metadata is dropped. |
+| Animated WebP | First frame only, with a warning. |
+| PNG already exists | Skipped; `--force` overwrites it. |
+| Name conflict | `logo.jpg` + `logo.webp` both want `logo.png`: the first by name wins, the rest are skipped (even with `--force`). |
+| Broken file | Reported as `failed`; the rest still convert. |
+| Exit code | `1` if any file failed, the folder doesn't exist, or the arguments are wrong; otherwise `0`. |
+
+PNG is lossless, so the PNG is often **larger** than the original — shrinking files is a separate tool (planned). Don't commit images: point the command at a folder outside the repo.
 
 ## CSS injector
 
