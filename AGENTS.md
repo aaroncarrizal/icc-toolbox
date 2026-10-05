@@ -11,6 +11,7 @@ icc-toolbox is a single npm package holding several small CLI tools that speed u
 | CSS injector + debug CLI | `src/tools/css-injector/` | `dev`, `css`, `dbg`, `build`, `start` |
 | px unit converters | `src/tools/units/` | `clamp`, `vw`, `vh` |
 | Image format converter | `src/tools/image-convert/` | `img:png` |
+| Image compressor | `src/tools/image-compress/` | `img:compress` |
 
 The main tool, the CSS injector, launches the system's Google Chrome with a dedicated debugging profile, injects local CSS files into a target site's page at document start (before the page's own content paints, so there's no flash of unstyled content), and hot-reloads whenever a CSS file changes on disk. Each local file gets its own `<style>` tag, and both local files and the site's own `<link>` stylesheets can be switched on and off live while the page is open. All of this — the injector, the source toggling and the debug CLI — talks to Chrome only through the **page-level** Chrome DevTools Protocol (CDP): every connection is opened directly to one page's own websocket, never to the browser-level websocket. That's deliberate — see **Rules for working on this tool** below.
 
@@ -23,6 +24,7 @@ The main tool, the CSS injector, launches the system's Google Chrome with a dedi
 | `npm run dbg -- <command>` | Debug CLI: screenshots, computed styles, CSS cascade inspection, viewport emulation, HTML preview |
 | `npm run clamp -- <px>` / `npm run vw -- <px>` / `npm run vh -- <px>` | Convert a pixel size to a `clamp()`/`vw`/`vh` value against a 1920×1080 base |
 | `npm run img:png -- <folder> [--force]` | Convert every `.jpg`/`.jpeg`/`.webp` directly in `<folder>` to PNG, into `<folder>/png/` |
+| `npm run img:compress -- <folder> [--force] [--max <size>] [--max-width <px>]` | Compress every `.jpg`/`.jpeg`/`.webp`/`.png` directly in `<folder>` to ≤ 1 MB (same format), into `<folder>/compressed/` |
 | `npm run build` | Build with Vite |
 | `npm run typecheck` | TypeScript type checking |
 | `npm start` | Run the built version |
@@ -31,11 +33,12 @@ The main tool, the CSS injector, launches the system's Google Chrome with a dedi
 
 ```
 src/
-├── shared/            # code used by 2+ tools (empty until a second tool needs something)
+├── shared/            # code used by 2+ tools (image-files.ts: list images in a folder)
 └── tools/
     ├── css-injector/   # injector, `css` and `dbg` CLIs
     ├── units/          # clamp / vw / vh converters
-    └── image-convert/  # jpg/jpeg/webp → png (img:png)
+    ├── image-convert/  # jpg/jpeg/webp → png (img:png)
+    └── image-compress/ # images → ≤ 1 MB, same format (img:compress)
 ```
 
 - **One folder per tool**, `src/tools/<name>/` (kebab-case), with its own entry point(s), its own config file if it needs one, and its own section in this file.
@@ -61,8 +64,20 @@ Converts images for upload to a dealer site. `npm run img:png -- <folder>` conve
 - **Originals are never touched**, other files are never opened, and subfolders (including `png/`) are not scanned.
 - An existing PNG is skipped unless `--force` is passed. Two sources that map to the same PNG name (`logo.jpg` + `logo.webp`, compared case-insensitively) → the first in name order wins, the rest are skipped as a name conflict even with `--force`.
 - A broken file is reported as `failed` and the rest still convert. Exit code is `1` if any file failed or the folder doesn't exist, else `0`.
-- PNG is lossless, so output is often larger than the source; shrinking files is a separate (planned) tool.
+- PNG is lossless, so output is often larger than the source; use `npm run img:compress` to shrink them.
 - Never put test or dealer images in the repo — point the command at a folder outside it, or don't commit the results.
+
+## Image Compressor (`npm run img:compress`)
+
+Shrinks images for upload to a dealer site. `npm run img:compress -- <folder>` processes every `.jpg`, `.jpeg`, `.webp` and `.png` (any letter case) **directly** in `<folder>` and writes each to `<folder>/compressed/<same name>`, at most **1 MB (1,000,000 bytes)**:
+
+- Files already under the limit are **copied unchanged**, so `compressed/` is a complete upload set.
+- Larger files **keep their format** and take the first step that fits: JPEG/WebP quality 85 → 75 → 65 → 60; PNG lossless → palette (reduced colors) q90 → q75 → q60. Only if none fit are dimensions reduced — never below 1000 px on the longest side. Still too big → `failed`, nothing written.
+- Transparency is kept; EXIF rotation is applied; camera metadata is dropped.
+- `--max <size>` changes the limit (`800KB`, `1.5MB`, bytes; decimal units). `--max-width <px>` scales wider images down first, even ones already under the limit.
+- Existing output is skipped unless `--force`. A broken or impossible file is reported as `failed` and the rest still run. Exit code `1` if anything failed or the arguments/folder are bad, else `0`.
+- Up to 4 files are processed at once (the JPEG encoder is single-threaded); output lines still print in name order. 50 camera-sized photos ≈ 25 s.
+- Never put test or dealer images in the repo.
 
 ## Fix Priority
 
@@ -176,7 +191,8 @@ Explain the findings (computed styles, bounding box, visibility, which rule wins
 
 ```
 src/
-├── shared/                    # code used by 2+ tools (currently empty)
+├── shared/
+│   └── image-files.ts         # listImageFiles(folder, extensions) — used by both image tools.
 └── tools/
     ├── css-injector/
     │   ├── index.ts        # CLI entry point (commander). Launches/reuses Chrome, connects Cdp to the
@@ -203,9 +219,12 @@ src/
     │   └── dbg.ts             # npm run dbg -- <command>
     ├── units/
     │   └── clamp.ts / vw.ts / vh.ts   # Standalone px → clamp()/vw/vh converters.
-    └── image-convert/
-        ├── index.ts       # npm run img:png — args (util.parseArgs), per-file output, summary, exit code.
-        └── convert.ts     # listSources / planConversions / convertOne (sharp). No console output.
+    ├── image-convert/
+    │   ├── index.ts       # npm run img:png — args (util.parseArgs), per-file output, summary, exit code.
+    │   └── convert.ts     # listSources / planConversions / convertOne (sharp). No console output.
+    └── image-compress/
+        ├── index.ts       # npm run img:compress — args, skip/--force, worker pool (≤ 4 at once), ordered output, summary.
+        └── compress.ts    # compressOne (copy or quality ladder → resize fallback), parseSize, formatBytes. No console output.
 ```
 
 ## Config

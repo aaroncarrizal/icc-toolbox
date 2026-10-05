@@ -7,6 +7,7 @@ A collection of small CLI tools that speed up ICC dealer-site development. Each 
 | CSS injector + debug CLI | `src/tools/css-injector/` | `npm run dev`, `npm run css`, `npm run dbg` |
 | px unit converters | `src/tools/units/` | `npm run clamp`, `npm run vw`, `npm run vh` |
 | Image format converter | `src/tools/image-convert/` | `npm run img:png` |
+| Image compressor | `src/tools/image-compress/` | `npm run img:compress` |
 
 Code shared by more than one tool goes in `src/shared/`; a tool never imports from another tool's folder.
 
@@ -44,7 +45,38 @@ npm run img:png -- --help              # usage
 | Broken file | Reported as `failed`; the rest still convert. |
 | Exit code | `1` if any file failed, the folder doesn't exist, or the arguments are wrong; otherwise `0`. |
 
-PNG is lossless, so the PNG is often **larger** than the original — shrinking files is a separate tool (planned). Don't commit images: point the command at a folder outside the repo.
+PNG is lossless, so the PNG is often **larger** than the original — shrink them with `npm run img:compress`. Don't commit images: point the command at a folder outside the repo.
+
+## Image compressor
+
+Shrinks `.jpg`, `.jpeg`, `.webp` and `.png` images to at most **1 MB** each — for dealer sites with upload limits.
+
+```bash
+npm run img:compress -- <folder>                    # compress
+npm run img:compress -- <folder> --force            # also overwrite existing output
+npm run img:compress -- <folder> --max 500KB        # different limit (KB/MB are decimal: 1MB = 1,000,000 bytes)
+npm run img:compress -- <folder> --max-width 1920   # also cap width
+npm run img:compress -- --help
+```
+
+```text
+[img:compress] compressed  photo.jpg     3.7 MB -> 916 KB  (resized 3707px, quality 60)
+[img:compress] compressed  graphic.png  10.8 MB -> 654 KB  (palette q75)
+[img:compress] copied      logo.png        3 KB
+[img:compress] failed      broken.jpg   (Input file contains unsupported image format)
+[img:compress] 2 compressed, 1 copied, 0 skipped, 1 failed — 14.5 MB -> 1.6 MB (saved 12.9 MB, 89%) — output: …\compressed
+```
+
+| Rule | Detail |
+|---|---|
+| Which files | `.jpg`, `.jpeg`, `.webp`, `.png` in any letter case, **directly** in `<folder>` (subfolders, including `compressed/`, aren't scanned). |
+| Output | `<folder>/compressed/<same name>` — same format and extension. Originals are never touched. |
+| Already under the limit | Copied unchanged, so `compressed/` is a complete upload set. |
+| Over the limit | Highest quality that fits: JPEG/WebP quality 85 → 75 → 65 → 60; PNG lossless, then reduced colors. Only then is the image made smaller — never below 1000 px on the longest side. |
+| Can't fit | Reported as `failed` with the best size reached; nothing is written for it. |
+| Image quality | Transparency kept, phone photos rotated correctly, camera metadata dropped. |
+| Output already exists | Skipped; `--force` overwrites it. |
+| Exit code | `1` if any file failed, the folder doesn't exist, or the arguments are wrong; otherwise `0`. |
 
 ## CSS injector
 
