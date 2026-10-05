@@ -10,6 +10,7 @@ icc-toolbox is a single npm package holding several small CLI tools that speed u
 |---|---|---|
 | CSS injector + debug CLI | `src/tools/css-injector/` | `dev`, `css`, `dbg`, `build`, `start` |
 | px unit converters | `src/tools/units/` | `clamp`, `vw`, `vh` |
+| Image format converter | `src/tools/image-convert/` | `img:png` |
 
 The main tool, the CSS injector, launches the system's Google Chrome with a dedicated debugging profile, injects local CSS files into a target site's page at document start (before the page's own content paints, so there's no flash of unstyled content), and hot-reloads whenever a CSS file changes on disk. Each local file gets its own `<style>` tag, and both local files and the site's own `<link>` stylesheets can be switched on and off live while the page is open. All of this — the injector, the source toggling and the debug CLI — talks to Chrome only through the **page-level** Chrome DevTools Protocol (CDP): every connection is opened directly to one page's own websocket, never to the browser-level websocket. That's deliberate — see **Rules for working on this tool** below.
 
@@ -21,6 +22,7 @@ The main tool, the CSS injector, launches the system's Google Chrome with a dedi
 | `npm run css -- <command>` | Toggle local files and remote stylesheets on/off while the page is open |
 | `npm run dbg -- <command>` | Debug CLI: screenshots, computed styles, CSS cascade inspection, viewport emulation, HTML preview |
 | `npm run clamp -- <px>` / `npm run vw -- <px>` / `npm run vh -- <px>` | Convert a pixel size to a `clamp()`/`vw`/`vh` value against a 1920×1080 base |
+| `npm run img:png -- <folder> [--force]` | Convert every `.jpg`/`.jpeg`/`.webp` directly in `<folder>` to PNG, into `<folder>/png/` |
 | `npm run build` | Build with Vite |
 | `npm run typecheck` | TypeScript type checking |
 | `npm start` | Run the built version |
@@ -32,7 +34,8 @@ src/
 ├── shared/            # code used by 2+ tools (empty until a second tool needs something)
 └── tools/
     ├── css-injector/   # injector, `css` and `dbg` CLIs
-    └── units/          # clamp / vw / vh converters
+    ├── units/          # clamp / vw / vh converters
+    └── image-convert/  # jpg/jpeg/webp → png (img:png)
 ```
 
 - **One folder per tool**, `src/tools/<name>/` (kebab-case), with its own entry point(s), its own config file if it needs one, and its own section in this file.
@@ -49,6 +52,17 @@ This repo is a toolbox for building, fixing and migrating many **independent** d
 - **Each dealer gets its own branch**, cut from `master` by `/set-up`, holding only that dealer's site work (`styles/`, `scripts/`, `.cssinjector.json`).
 - **Dealer branches are never merged** — not into `master`, not into each other, and they don't pull later `master` changes. An existing dealer branch keeps the toolbox version it was cut with; new toolbox features reach a dealer the next time a branch is cut from `master`.
 - Never commit dealer-specific work to `master`, and never suggest merging `master` into a dealer branch.
+
+## Image Converter (`npm run img:png`)
+
+Converts images for upload to a dealer site. `npm run img:png -- <folder>` converts every `.jpg`, `.jpeg` and `.webp` (any letter case) **directly** in `<folder>` to PNG:
+
+- Output goes to `<folder>/png/<same name>.png`. Pixel size and WebP transparency are kept; JPEG EXIF rotation is applied so phone photos aren't sideways.
+- **Originals are never touched**, other files are never opened, and subfolders (including `png/`) are not scanned.
+- An existing PNG is skipped unless `--force` is passed. Two sources that map to the same PNG name (`logo.jpg` + `logo.webp`, compared case-insensitively) → the first in name order wins, the rest are skipped as a name conflict even with `--force`.
+- A broken file is reported as `failed` and the rest still convert. Exit code is `1` if any file failed or the folder doesn't exist, else `0`.
+- PNG is lossless, so output is often larger than the source; shrinking files is a separate (planned) tool.
+- Never put test or dealer images in the repo — point the command at a folder outside it, or don't commit the results.
 
 ## Fix Priority
 
@@ -187,8 +201,11 @@ src/
     │   ├── css-lint.ts        # CSS.supports()-based check for invalid declarations, logged as warnings.
     │   ├── css-cli.ts         # npm run css -- <command>
     │   └── dbg.ts             # npm run dbg -- <command>
-    └── units/
-        └── clamp.ts / vw.ts / vh.ts   # Standalone px → clamp()/vw/vh converters.
+    ├── units/
+    │   └── clamp.ts / vw.ts / vh.ts   # Standalone px → clamp()/vw/vh converters.
+    └── image-convert/
+        ├── index.ts       # npm run img:png — args (util.parseArgs), per-file output, summary, exit code.
+        └── convert.ts     # listSources / planConversions / convertOne (sharp). No console output.
 ```
 
 ## Config

@@ -71,11 +71,11 @@ scratchpad (never in the repo).
 
 ## Phase 5: Polish & Cross-Cutting Concerns
 
-- [ ] T016 Performance check per [quickstart.md](quickstart.md) §4: 50 generated 1920×1080 JPEGs in the scratchpad convert in < 30 s (SC-001)
-- [ ] T017 [P] In `AGENTS.md`: add `npm run img:png -- <folder> [--force]` to the Commands table; add an `image-convert` row to the Project Overview tools table; add `image-convert/` to the Toolbox Layout tree and the Architecture tree (`index.ts` CLI, `convert.ts` logic); add an "Image Converter (`npm run img:png`)" section summarizing behavior (png/ subfolder, originals kept, top-level only, skip/--force/conflict rules, exit codes)
-- [ ] T018 [P] In `README.md`: add an image-convert row to the tools table and a short usage example
-- [ ] T019 Run `npm run typecheck` and smoke-test `npm run clamp -- 24` (existing tools unaffected); commit as `docs: document img:png in AGENTS.md and README`
-- [ ] T020 Delete the scratchpad fixtures/spike folders; confirm `git status` is clean and no images were added to the repo
+- [X] T016 Performance check per [quickstart.md](quickstart.md) §4: 50 generated 1920×1080 JPEGs in the scratchpad convert in < 30 s (SC-001)
+- [X] T017 [P] In `AGENTS.md`: add `npm run img:png -- <folder> [--force]` to the Commands table; add an `image-convert` row to the Project Overview tools table; add `image-convert/` to the Toolbox Layout tree and the Architecture tree (`index.ts` CLI, `convert.ts` logic); add an "Image Converter (`npm run img:png`)" section summarizing behavior (png/ subfolder, originals kept, top-level only, skip/--force/conflict rules, exit codes)
+- [X] T018 [P] In `README.md`: add an image-convert row to the tools table and a short usage example
+- [X] T019 Run `npm run typecheck` and smoke-test `npm run clamp -- 24` (existing tools unaffected); commit as `docs: document img:png in AGENTS.md and README`
+- [X] T020 Delete the scratchpad fixtures/spike folders; confirm `git status` is clean and no images were added to the repo
 
 ---
 

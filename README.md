@@ -6,10 +6,20 @@ A collection of small CLI tools that speed up ICC dealer-site development. Each 
 |---|---|---|
 | CSS injector + debug CLI | `src/tools/css-injector/` | `npm run dev`, `npm run css`, `npm run dbg` |
 | px unit converters | `src/tools/units/` | `npm run clamp`, `npm run vw`, `npm run vh` |
+| Image format converter | `src/tools/image-convert/` | `npm run img:png` |
 
 Code shared by more than one tool goes in `src/shared/`; a tool never imports from another tool's folder.
 
 **Branches:** `master` is the toolbox itself. Each dealer gets an independent branch cut from `master` (via `/set-up`) that is never merged back or updated from `master` — it keeps the toolbox version it was created with.
+
+## Image converter
+
+```bash
+npm run img:png -- ./path/to/images           # .jpg/.jpeg/.webp → ./path/to/images/png/*.png
+npm run img:png -- ./path/to/images --force   # overwrite PNGs that already exist
+```
+
+Originals are kept; only files directly in the folder are converted.
 
 ## CSS injector
 
