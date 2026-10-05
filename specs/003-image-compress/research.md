@@ -74,6 +74,12 @@ with deliberately hard, noise-heavy images.
 
 ## 8. Throughput
 
-- **Decision**: Sequential processing. The spike's worst-case photo took ~5 encodes; typical
-  camera JPEGs fit at q85 after one or two encodes. Measure against SC-002 in polish; parallelism
-  is a later optimization if needed.
+- **Initial decision**: sequential processing.
+- **Measured (T020)**: 50 camera-like 4000×3000 JPEGs (3.0 MB each, fit at q75) took **75 s**
+  sequentially — misses SC-002 (< 60 s). The mozjpeg encoder is single-threaded, so one file at a
+  time leaves most cores idle.
+- **Final decision**: process up to `min(4, os.availableParallelism())` files at once with a small
+  worker pool; per-file lines are still printed in name order. Same 50 files: **25 s**. Output and
+  results identical to sequential (scenario 1 re-run).
+- **Alternatives considered**: dropping mozjpeg (bigger files at the same quality); decoding once
+  to raw pixels (more code, smaller gain than parallelism).

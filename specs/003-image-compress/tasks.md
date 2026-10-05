@@ -72,7 +72,7 @@ scenarios in [quickstart.md](quickstart.md), run in the session scratchpad (neve
 
 ## Phase 5: Polish & Cross-Cutting Concerns
 
-- [ ] T020 Performance check per [quickstart.md](quickstart.md) §4: 50 camera-like 4000×3000 JPEGs in < 60 s (SC-002); record the time
+- [X] T020 Performance check per [quickstart.md](quickstart.md) §4: 50 camera-like 4000×3000 JPEGs in < 60 s (SC-002); record the time
 - [ ] T021 [P] In `AGENTS.md`: add `npm run img:compress -- <folder> [--force] [--max <size>] [--max-width <px>]` to Commands; add an image-compress row to the Project Overview tools table; add `image-compress/` and `shared/image-files.ts` to the Toolbox Layout and Architecture trees (and drop "empty" from the `shared/` description); add an "Image Compressor (`npm run img:compress`)" section (strategy ladder, floors, copied small files, `--max`, `--max-width`, skip/`--force`, exit codes)
 - [ ] T022 [P] In `README.md`: add an image-compress row to the tools table and an "Image compressor" usage section like the converter's; replace "shrinking files is a separate tool (planned)" in the converter section with a pointer to `img:compress`
 - [ ] T023 Run `npm run typecheck` and smoke-test `npm run clamp -- 24` and `npm run img:png -- --help`; commit as `docs: document img:compress in AGENTS.md and README`

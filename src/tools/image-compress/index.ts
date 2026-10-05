@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { mkdir, stat } from "node:fs/promises";
+import { availableParallelism } from "node:os";
 import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { listImageFiles } from "../../shared/image-files.ts";
@@ -13,6 +14,7 @@ import {
 } from "./compress.ts";
 
 const TAG = "[img:compress]";
+const CONCURRENCY = Math.min(4, availableParallelism());
 const USAGE = `Usage: npm run img:compress -- <folder> [--force] [--max <size>] [--max-width <px>]
 
 Compresses every .jpg, .jpeg, .webp and .png file directly in <folder> to at most <size>,
@@ -103,21 +105,27 @@ const plan = files.map((file) => {
 if (plan.some((p) => !p.exists)) await mkdir(outDir, { recursive: true });
 
 const width = Math.max(...files.map((f) => f.name.length));
-const results: CompressionResult[] = [];
-for (const { file, outPath, exists } of plan) {
-  let result: CompressionResult;
-  if (exists) {
-    result = { source: file, outPath, status: "skipped", reason: "already exists — use --force to overwrite" };
-  } else {
-    try {
-      result = await compressOne(file, outPath, { limit, maxWidth });
-    } catch (err) {
-      result = { source: file, outPath, status: "failed", reason: (err as Error).message };
-    }
+async function processOne({ file, outPath, exists }: (typeof plan)[number]): Promise<CompressionResult> {
+  if (exists) return { source: file, outPath, status: "skipped", reason: "already exists — use --force to overwrite" };
+  try {
+    return await compressOne(file, outPath, { limit, maxWidth });
+  } catch (err) {
+    return { source: file, outPath, status: "failed", reason: (err as Error).message };
   }
-  results.push(result);
-  console.log(formatResult(result, width));
 }
+
+// The JPEG encoder is single-threaded, so a few files run at once; lines still print in name order.
+const results: CompressionResult[] = new Array(plan.length);
+let next = 0;
+let printed = 0;
+async function worker() {
+  while (next < plan.length) {
+    const i = next++;
+    results[i] = await processOne(plan[i]);
+    while (printed < plan.length && results[printed]) console.log(formatResult(results[printed++], width));
+  }
+}
+await Promise.all(Array.from({ length: Math.min(CONCURRENCY, plan.length) }, worker));
 
 const count = (status: CompressionResult["status"]) => results.filter((r) => r.status === status).length;
 const written = results.filter((r) => r.status === "compressed" || r.status === "copied");
