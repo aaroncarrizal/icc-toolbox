@@ -9,6 +9,8 @@ A collection of small CLI tools that speed up ICC dealer-site development. Each 
 
 Code shared by more than one tool goes in `src/shared/`; a tool never imports from another tool's folder.
 
+**Branches:** `master` is the toolbox itself. Each dealer gets an independent branch cut from `master` (via `/set-up`) that is never merged back or updated from `master` — it keeps the toolbox version it was created with.
+
 ## CSS injector
 
 A CLI tool that injects local CSS files into any published website with instant hot reload, and lets you switch individual CSS sources — your own files or the site's own stylesheets — on and off while the page stays open. It launches Chrome directly (no browser-automation framework) and talks to it only through one page's own Chrome DevTools Protocol (CDP) connection, so opening DevTools alongside it never causes trouble.

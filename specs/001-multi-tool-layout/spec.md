@@ -73,9 +73,9 @@ the move.
 
 - Code that resolves paths relative to its own file location (rather than the working directory)
   could silently point to the wrong place after moving deeper into the tree.
-- Dealer branches created from the old `master` will need to merge this change; dealer-owned
-  files (`styles/`, `scripts/`, `snippets/`, `.cssinjector.json`) must not move, so merges don't
-  conflict on them.
+- Dealer branches are independent and never merged with `master`; existing ones keep the old
+  layout. Dealer-owned files (`styles/`, `scripts/`, `snippets/`, `.cssinjector.json`) must not
+  move, so `/set-up` and the dealer workflow stay the same on every new branch cut from `master`.
 - Skills and docs that mention old source paths (e.g. `src/cdp.ts`) must be updated so agents
   don't look in the wrong place.
 - The unit converters must not end up importing from the CSS injector (or vice versa).

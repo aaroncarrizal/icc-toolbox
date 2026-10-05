@@ -41,6 +41,15 @@ src/
 - Dealer working files (`styles/`, `scripts/`, `snippets/`, `debug/`, `.cssinjector*.json`) stay at the repo root and belong to the CSS injector.
 - Adding a tool = a new folder under `src/tools/`, a new script in `package.json`, a new section here.
 
+## Branches: Toolbox vs. Dealers
+
+This repo is a toolbox for building, fixing and migrating many **independent** dealer sites.
+
+- **`master` is the toolbox**: tools, skills, docs. Toolbox changes are made on a feature branch and merged into `master` only.
+- **Each dealer gets its own branch**, cut from `master` by `/set-up`, holding only that dealer's site work (`styles/`, `scripts/`, `.cssinjector.json`).
+- **Dealer branches are never merged** — not into `master`, not into each other, and they don't pull later `master` changes. An existing dealer branch keeps the toolbox version it was cut with; new toolbox features reach a dealer the next time a branch is cut from `master`.
+- Never commit dealer-specific work to `master`, and never suggest merging `master` into a dealer branch.
+
 ## Fix Priority
 
 Try fixes in this order, and say in the final report which layer a fix landed in (and why, if it wasn't CSS):

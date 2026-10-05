@@ -70,7 +70,11 @@ Rationale: one maintainer, small tools — fewer moving parts means faster fixes
 
 ## Development Workflow
 
-- Work happens on a branch, never directly on `master`.
+- `master` is the toolbox (tools, skills, docs). Toolbox work happens on a feature branch and is
+  merged into `master` only.
+- Each dealer gets an independent branch cut from `master` (via `/set-up`) holding only that
+  dealer's site work. Dealer branches MUST NOT be merged into `master` or each other, and MUST NOT
+  pull later `master` changes; dealer-specific work MUST NOT be committed to `master`.
 - `npm run typecheck` MUST pass before every commit.
 - Every npm script touched by a change MUST be smoke-tested (run at least once) before the change
   is reported complete.
@@ -93,4 +97,4 @@ Complexity Tracking section.
 - Runtime development guidance lives in `AGENTS.md`; where the two conflict, this constitution
   wins and AGENTS.md MUST be corrected.
 
-**Version**: 1.0.0 | **Ratified**: 2026-10-05 | **Last Amended**: 2026-10-05
+**Version**: 1.1.0 | **Ratified**: 2026-10-05 | **Last Amended**: 2026-10-05
