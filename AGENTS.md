@@ -63,7 +63,6 @@ Converts images for upload to a dealer site. `npm run img:png -- <folder>` conve
 - A broken file is reported as `failed` and the rest still convert. Exit code is `1` if any file failed or the folder doesn't exist, else `0`.
 - PNG is lossless, so output is often larger than the source; shrinking files is a separate (planned) tool.
 - Never put test or dealer images in the repo — point the command at a folder outside it, or don't commit the results.
-- Full reference: [src/tools/image-convert/README.md](src/tools/image-convert/README.md).
 
 ## Fix Priority
 

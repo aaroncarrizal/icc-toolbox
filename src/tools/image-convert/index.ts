@@ -1,16 +1,3 @@
-/**
- * img:png — converts every .jpg/.jpeg/.webp directly in a folder to PNG, written to <folder>/png/.
- *
- *   npm run img:png -- <folder> [--force]
- *
- * This file is the CLI shell: argument parsing, folder validation, printing and the exit code.
- * The actual work (finding images, deciding what to skip, encoding) lives in convert.ts, which
- * never prints. See README.md in this folder for the full behavior.
- *
- * Exit codes: 0 = everything converted or skipped (including "nothing to do");
- *             1 = bad arguments, folder missing, or at least one file failed.
- */
-
 import { mkdir, stat } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 import { parseArgs } from "node:util";
@@ -26,7 +13,6 @@ Options:
   -f, --force   Overwrite PNGs that already exist in <folder>/png/
   -h, --help    Show this help`;
 
-/** Parses argv. Exits on --help (0) and on bad/missing arguments (1); otherwise returns an absolute folder. */
 function parseCli(): { folder: string; force: boolean } {
   let parsed;
   try {
@@ -52,7 +38,6 @@ function parseCli(): { folder: string; force: boolean } {
   return { folder: resolve(parsed.positionals[0]), force: parsed.values.force ?? false };
 }
 
-/** True if `path` exists and is a directory — false for missing paths instead of throwing. */
 async function isDirectory(path: string): Promise<boolean> {
   try {
     return (await stat(path)).isDirectory();
@@ -61,7 +46,6 @@ async function isDirectory(path: string): Promise<boolean> {
   }
 }
 
-/** One aligned output line per file; `width` is the longest source name so the columns line up. */
 function formatResult(r: ConversionResult, folder: string, width: number): string {
   const name = r.source.name.padEnd(width);
   const status = r.status.padEnd(10);
@@ -87,7 +71,6 @@ if (sources.length === 0) {
 
 const outDir = join(folder, "png");
 const plan = planConversions(sources, outDir, force);
-// Only create png/ when something will actually be written, so an all-skipped run leaves no trace.
 if (plan.some((p) => !p.skip)) await mkdir(outDir, { recursive: true });
 
 const width = Math.max(...sources.map((s) => s.name.length));
@@ -97,7 +80,6 @@ for (const { source, outPath, skip } of plan) {
   if (skip) {
     result = { source, outPath, status: "skipped", reason: skip };
   } else {
-    // One bad file must not stop the batch: record it as failed and keep going.
     try {
       result = await convertOne(source, outPath);
     } catch (err) {
