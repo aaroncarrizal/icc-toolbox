@@ -271,6 +271,10 @@ When the user gives a dealer name and a build-site link (or types `/set-up`), fo
 
 When the user asks to create a new lead form or update an existing one (fields, `FormType`, redirect, lead email routing), follow the skill in [.claude/skills/custom-forms/SKILL.md](.claude/skills/custom-forms/SKILL.md). In short: forms are configured by case-sensitive hidden inputs at the bottom of the form markup — `FormType` (ICC inbox label) and `AjaxTarget` (`/Forms/Ajax`, never edited) on every form, the default `RedirectUrl`/`SuccessMessage`/email-template fields, and optional `AccountOverRideEmail`. Custom questions use `jem[Group]_Field` names. Build new forms from a working form on the same site, preview with `dbg replace`, and hand the user the markup to paste into the CMS.
 
+## Content Migration (`/content-migration`)
+
+When the user gives an old-site page URL and asks to create or migrate that page, follow the skill in [.claude/skills/content-migration/SKILL.md](.claude/skills/content-migration/SKILL.md). In short: one file per page in `snippets/pages/`, built on [snippets/pages/base.html](snippets/pages/base.html) with **plain Bootstrap 3** (rows/cols, `img-responsive`, carousel) and only minor, page-scoped CSS tweaks at the end of `home.css` when Bootstrap can't get close to the old look. Fetch the old page with `curl` (never navigate the debug tab cross-origin — it breaks the injector), verify image order byte-for-byte before mapping `internal/<page>-<n>.png`, rewrite old links to new paths, never put block elements inside `<a>` (the CMS editor moves them out), forms go in `snippets/forms/` via `/custom-forms`, and preview with `dbg inner ".pageContent"` on an existing subpage.
+
 ## List of Fixes Workflow
 
 When the user provides a numbered list of CSS fixes/features to apply to the target site:
