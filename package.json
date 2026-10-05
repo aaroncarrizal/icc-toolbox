@@ -7,12 +7,12 @@
     "icc-toolbox": "./dist/index.js"
   },
   "scripts": {
-    "dev": "node src/index.ts",
-    "css": "node src/css-cli.ts",
-    "dbg": "node src/dbg.ts",
-    "clamp": "node src/clamp.ts",
-    "vw": "node src/vw.ts",
-    "vh": "node src/vh.ts",
+    "dev": "node src/tools/css-injector/index.ts",
+    "css": "node src/tools/css-injector/css-cli.ts",
+    "dbg": "node src/tools/css-injector/dbg.ts",
+    "clamp": "node src/tools/units/clamp.ts",
+    "vw": "node src/tools/units/vw.ts",
+    "vh": "node src/tools/units/vh.ts",
     "build": "vite build",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit"

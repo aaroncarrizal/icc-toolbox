@@ -4,7 +4,7 @@ export default defineConfig({
   build: {
     target: "node24",
     lib: {
-      entry: "src/index.ts",
+      entry: "src/tools/css-injector/index.ts",
       formats: ["es"],
       fileName: "index",
     },
