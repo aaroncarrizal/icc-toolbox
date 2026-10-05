@@ -1,7 +1,7 @@
 import { mkdir, stat } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 import { parseArgs } from "node:util";
-import { convertOne, listSources, pngPathFor, type ConversionResult } from "./convert.ts";
+import { convertOne, listSources, planConversions, type ConversionResult } from "./convert.ts";
 
 const TAG = "[img:png]";
 const USAGE = `Usage: npm run img:png -- <folder> [--force]
@@ -13,7 +13,7 @@ Options:
   -f, --force   Overwrite PNGs that already exist in <folder>/png/
   -h, --help    Show this help`;
 
-function parseCli(): { folder: string } {
+function parseCli(): { folder: string; force: boolean } {
   let parsed;
   try {
     parsed = parseArgs({
@@ -35,7 +35,7 @@ function parseCli(): { folder: string } {
     console.error(USAGE);
     process.exit(1);
   }
-  return { folder: resolve(parsed.positionals[0]) };
+  return { folder: resolve(parsed.positionals[0]), force: parsed.values.force ?? false };
 }
 
 async function isDirectory(path: string): Promise<boolean> {
@@ -56,7 +56,7 @@ function formatResult(r: ConversionResult, folder: string, width: number): strin
   return `${TAG} ${status} ${name} (${r.reason})`;
 }
 
-const { folder } = parseCli();
+const { folder, force } = parseCli();
 
 if (!(await isDirectory(folder))) {
   console.error(`${TAG} Not a folder: ${folder}`);
@@ -70,12 +70,22 @@ if (sources.length === 0) {
 }
 
 const outDir = join(folder, "png");
-await mkdir(outDir, { recursive: true });
+const plan = planConversions(sources, outDir, force);
+if (plan.some((p) => !p.skip)) await mkdir(outDir, { recursive: true });
 
 const width = Math.max(...sources.map((s) => s.name.length));
 const results: ConversionResult[] = [];
-for (const source of sources) {
-  const result = await convertOne(source, pngPathFor(source, outDir));
+for (const { source, outPath, skip } of plan) {
+  let result: ConversionResult;
+  if (skip) {
+    result = { source, outPath, status: "skipped", reason: skip };
+  } else {
+    try {
+      result = await convertOne(source, outPath);
+    } catch (err) {
+      result = { source, outPath, status: "failed", reason: (err as Error).message };
+    }
+  }
   results.push(result);
   console.log(formatResult(result, folder, width));
 }
@@ -84,3 +94,4 @@ const count = (status: ConversionResult["status"]) => results.filter((r) => r.st
 console.log(
   `${TAG} ${count("converted")} converted, ${count("skipped")} skipped, ${count("failed")} failed — output: ${outDir}`,
 );
+if (count("failed") > 0) process.exitCode = 1;

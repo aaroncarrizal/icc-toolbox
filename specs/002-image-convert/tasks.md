@@ -60,10 +60,10 @@ scratchpad (never in the repo).
 
 **Independent Test**: [quickstart.md](quickstart.md) scenarios 1, 3, 4 in full.
 
-- [ ] T012 [US2] In `src/tools/image-convert/convert.ts` implement `planConversions(sources, outDir, force)`: map each source to `<outDir>/<base>.png`; track claimed targets by **lower-cased** path — a later source with an already-claimed target → `skipped`, `reason: "name conflict with <first name>"` even with `force`; else if the target exists and `!force` → `skipped`, `reason: "already exists: png/<file> — use --force to overwrite"`; else → to convert (research §6)
-- [ ] T013 [US2] In `src/tools/image-convert/index.ts` use `planConversions` before converting; wrap each `convertOne` in try/catch → `failed` with `reason: error.message` and keep going (FR-007); only `mkdir png/` if at least one file will be converted; set `process.exitCode = 1` when any result failed (research §7)
-- [ ] T014 [US2] Run `npm run typecheck`, then [quickstart.md](quickstart.md) scenarios 1, 3 and 4 in full against the fixture folder and confirm the exact counts listed there
-- [ ] T015 [US2] Commit as `feat(img:png): skip existing/conflicting files, --force, isolate failures`
+- [X] T012 [US2] In `src/tools/image-convert/convert.ts` implement `planConversions(sources, outDir, force)`: map each source to `<outDir>/<base>.png`; track claimed targets by **lower-cased** path — a later source with an already-claimed target → `skipped`, `reason: "name conflict with <first name>"` even with `force`; else if the target exists and `!force` → `skipped`, `reason: "already exists: png/<file> — use --force to overwrite"`; else → to convert (research §6)
+- [X] T013 [US2] In `src/tools/image-convert/index.ts` use `planConversions` before converting; wrap each `convertOne` in try/catch → `failed` with `reason: error.message` and keep going (FR-007); only `mkdir png/` if at least one file will be converted; set `process.exitCode = 1` when any result failed (research §7)
+- [X] T014 [US2] Run `npm run typecheck`, then [quickstart.md](quickstart.md) scenarios 1, 3 and 4 in full against the fixture folder and confirm the exact counts listed there
+- [X] T015 [US2] Commit as `feat(img:png): skip existing/conflicting files, --force, isolate failures`
 
 **Checkpoint**: tool is safe to re-run.
 

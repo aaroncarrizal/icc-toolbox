@@ -1,5 +1,6 @@
+import { existsSync } from "node:fs";
 import { readdir, writeFile } from "node:fs/promises";
-import { extname, join } from "node:path";
+import { basename, extname, join } from "node:path";
 import sharp from "sharp";
 
 const EXTENSIONS = ["jpg", "jpeg", "webp"] as const;
@@ -34,6 +35,32 @@ export async function listSources(folder: string): Promise<SourceImage[]> {
 /** Target PNG path for a source: <outDir>/<base name>.png */
 export function pngPathFor(source: SourceImage, outDir: string): string {
   return join(outDir, source.name.slice(0, -extname(source.name).length) + ".png");
+}
+
+export interface PlannedConversion {
+  source: SourceImage;
+  outPath: string;
+  skip?: string;
+}
+
+/**
+ * Decides what happens to each source before anything is written. Targets are compared
+ * case-insensitively (Windows/macOS file systems are), so `logo.jpg` and `Logo.webp` conflict:
+ * the first one in name order wins, the rest are skipped even with --force.
+ */
+export function planConversions(sources: SourceImage[], outDir: string, force: boolean): PlannedConversion[] {
+  const claimed = new Map<string, string>();
+  return sources.map((source) => {
+    const outPath = pngPathFor(source, outDir);
+    const key = outPath.toLowerCase();
+    const owner = claimed.get(key);
+    if (owner) return { source, outPath, skip: `name conflict with ${owner}` };
+    claimed.set(key, source.name);
+    if (!force && existsSync(outPath)) {
+      return { source, outPath, skip: `already exists: png/${basename(outPath)} — use --force to overwrite` };
+    }
+    return { source, outPath };
+  });
 }
 
 /** Encodes fully in memory before writing, so a failure never leaves a partial PNG. */
