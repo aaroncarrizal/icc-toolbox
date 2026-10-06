@@ -275,6 +275,10 @@ When the user asks to create a new lead form or update an existing one (fields, 
 
 When the user gives an old-site page URL and asks to create or migrate that page, follow the skill in [.claude/skills/content-migration/SKILL.md](.claude/skills/content-migration/SKILL.md). In short: one file per page in `snippets/pages/`, built on [snippets/pages/base.html](snippets/pages/base.html) with **plain Bootstrap 3** (rows/cols, `img-responsive`, carousel) and only minor, page-scoped CSS tweaks at the end of `home.css` when Bootstrap can't get close to the old look. Fetch the old page with `curl` (never navigate the debug tab cross-origin — it breaks the injector), verify image order byte-for-byte before mapping `internal/<page>-<n>.png`, rewrite old links to new paths, never put block elements inside `<a>` (the CMS editor moves them out), forms go in `snippets/forms/` via `/custom-forms`, and preview with `dbg inner ".pageContent"` on an existing subpage.
 
+## Kenect Reviews (`/kenect-reviews`)
+
+When the user shares an old-site URL that has the Kenect reviews/testimonials carousel and wants it on the new site, follow the skill in [.claude/skills/kenect-reviews/SKILL.md](.claude/skills/kenect-reviews/SKILL.md). In short: `curl` the old page and copy the `data-publicId` from the `reviews_widget.min.js` script, then hand the user two pieces: a loader script for the page's **Page Footer Scripts** (Developer tab), which appends the Kenect script into `#reviews-widget`, and a `<div id="reviews-widget">` container for the page content. The CMS doesn't allow scripts inside content. Preview by inserting both live with `dbg eval`, and add only section spacing in `home.css`.
+
 ## List of Fixes Workflow
 
 When the user provides a numbered list of CSS fixes/features to apply to the target site:
