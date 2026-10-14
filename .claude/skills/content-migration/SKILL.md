@@ -92,7 +92,8 @@ Put the hover effect on the `div` (`.charity-card:hover h3 { ... }`) instead of 
 Keep the old wording. Fix only what's clearly broken, and list every change in the report:
 
 - **Links:** rewrite every old-site URL to its new path (`/rv-search`, `/rv-financing`, `/consignment`, `/about-us`, `/contact-us`, `/rv-parts`, `/rv-service`, `/testimonials`, `/staff`…). Type pages use `/product/<type>` (e.g. `/product/travel-trailer`). Links to dead old-platform features (Dealer Spike staff contact forms, `/--contactstaff?...`) get dropped or pointed at `/contact-us`. No suncityrv.com-style old URLs may remain; grep for them.
-- **Phone numbers** become `<a href="tel:6239798585">(623) 979-8585</a>`; extensions use `tel:6239798585,113`.
+- **Dealer info uses CMS shortcodes** (see **CMS Shortcodes** in AGENTS.md): the dealer's name in copy → `[#DealerName]`, the main phone → `<a href="tel:[#DealerPhoneNoFormat]">[#DealerPhone]</a>`, address/city/state → `[#DealerAddress]` / `[#DealerCity]` / `[#DealerState]`, credit-app links → `[#CreditAppUrl]`. For a specific lot on a multi-location dealer use `[#LotPhone-{lotdesc}]` etc. (ask for the Lot Name if unknown).
+- **Other phone numbers** (department lines, extensions) stay hardcoded: `<a href="tel:6239798585">(623) 979-8585</a>`; extensions use `tel:6239798585,113`.
 - **External links** keep `target="_blank"` and get `rel="noopener"`.
 - **Typos and broken grammar** in the old copy ("Be rest assured", "to to", "S1,000" for "$1,000"): fix them.
 - **Editor notes** left in live copy (e.g. "(link to google reviews?)"): remove.
