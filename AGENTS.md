@@ -263,6 +263,38 @@ Config is loaded from `.cssinjector.json` in the project root (copy `.cssinjecto
 - CDP emulation (`Emulation.setDeviceMetricsOverride`, etc.) belongs to the connection that set it and disappears when that connection closes. A short-lived `dbg` command can't make a viewport change persist — that's why `bp`/`resize` write to the state file instead, and the injector's long-lived session applies it.
 - The TypeScript in `src/` runs directly on Node (no build step for `npm run dev`/`dbg`/`css`): relative imports use an explicit `.ts` extension, type-only imports use `import type`, and the syntax stays "erasable" (no `enum`, no `namespace`, no constructor parameter properties).
 
+## CMS Shortcodes
+
+Any HTML handed to the user for the CMS (pages, snippets, forms, hero/footer markup, meta text) should use the Ignite shortcodes instead of hardcoding dealer info, so a name/phone/address change is one edit in the dealer's settings instead of a hunt through every page. The CMS replaces them server-side when the page renders.
+
+| Shortcode | Renders | Source |
+|---|---|---|
+| `[#DealerName]` | Dealer name | Company Profile. Use it wherever the dealer's name appears in copy (About Us blurbs, SEO/meta text). |
+| `[#DealerPhone]` | Primary lot's phone, formatted: `(555) 555-5555` | Primary lot |
+| `[#DealerPhoneNoFormat]` | Primary lot's phone, digits only: `5555555555` | Primary lot. For `tel:` links. |
+| `[#DealerAddress]` | Primary lot's full address | Primary lot |
+| `[#DealerCity]` / `[#DealerState]` | Primary lot's city / state | Primary lot |
+| `[#DealerLocation]` | Auto-formatted location list (changes with the number of lots and states) | All lots. Preferred on multi-location pages. |
+| `[#CreditAppUrl]` | The Credit App URL | Domain node, Developer tab. Use for every financing/credit-app link or button. |
+| `[#DealerAssetsFolder]` | The dealer's assets folder name | Company Profile. Mostly in the Developer area (favicons etc.). |
+
+Phone link pattern:
+
+```html
+<a href="tel:[#DealerPhoneNoFormat]">[#DealerPhone]</a>
+```
+
+**Multi-location dealers:** every `Dealer*` shortcode above (except `DealerName`, `DealerLocation`, `CreditAppUrl`) only returns the **primary** lot. For a specific lot use the per-lot forms: `[#LotPhone-{lotdesc}]`, `[#LotPhoneNoFormat-{lotdesc}]`, `[#LotAddress-{lotdesc}]`, `[#LotCity-{lotdesc}]`, `[#LotState-{lotdesc}]`.
+
+- `{lotdesc}` is the lot's **Lot Name** field, lowercased with spaces and every other non-alphanumeric character removed: "Denton" → `denton`, "Chichester, NH" → `chichesternh`, "Knoxville Turkey Creek TN" → `knoxvilleturkeycreektn`. E.g. `<a href="tel:[#LotPhoneNoFormat-denton]">[#LotPhone-denton]</a>`.
+- Lot shortcodes only render if that lot is enabled on the dealer's domain.
+- The Lot Name isn't visible on the public site — if you don't know it, ask the user instead of guessing a `{lotdesc}`.
+
+Gotchas:
+
+- Shortcodes are **not** expanded by `dbg replace` / `dbg inner` previews (those write straight into the live DOM), so the preview shows the literal `[#DealerPhone]` text. For previews, either accept the literal text or temporarily preview with the real value — but the markup handed to the user keeps the shortcode.
+- Hardcode a value only when it shouldn't track the dealer settings: a department's own number or extension (`tel:6239798585,113`), a lot-specific value with no known `{lotdesc}`, or text the user explicitly wants fixed. Mention any hardcoded dealer info in the report.
+
 ## New Dealer Setup (`/set-up`)
 
 When the user gives a dealer name and a build-site link (or types `/set-up`), follow the skill in [.claude/skills/set-up/SKILL.md](.claude/skills/set-up/SKILL.md). In short: slug the dealer name into a branch, create it from an up-to-date `master` and check it out, fill in `.cssinjector.json` (`url`, basic auth detected with `curl`, `stripPatterns` reset to `[]`), commit, and report back.
