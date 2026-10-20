@@ -2,7 +2,7 @@ export {};
 const size = Number(process.argv[2]);
 
 if (isNaN(size)) {
-  console.error("Uso: npm run clamp -- <tamaño>");
+  console.error("Usage: npm run clamp -- <px>   (e.g. npm run clamp -- 24)");
   process.exit(1);
 }
 
