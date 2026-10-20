@@ -1,10 +1,14 @@
 {
-  "url": "https://www.campsiterv.com/",
+  "url": "https://example.com",
   "dir": "./styles",
   "include": "**/*.css",
   "exclude": "",
   "headless": false,
-  "stripPatterns": ["//assets.interactcp.com/*.default.css"],
-  "username": "interactrv",
-  "password": "access"
+  "stripPatterns": [],
+  "username": "",
+  "password": "",
+  "chromePath": "",
+  "scripts": false,
+  "jsDir": "./scripts",
+  "jsInclude": "**/*.js"
 }

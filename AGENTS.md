@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This file provides context for AI agents working on icc-toolbox (formerly CSS Injector).
+This file provides context for AI agents working on icc-toolbox (formerly CSS Injector). Install steps and the human-facing guide (daily workflow, every command, troubleshooting, Windows/PowerShell notes) are in [README.md](README.md); keep both in sync when a command or rule changes.
 
 ## Project Overview
 

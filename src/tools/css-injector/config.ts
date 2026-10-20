@@ -34,11 +34,21 @@ export const DEFAULT_CONFIG: Config = {
 };
 
 export async function loadConfig(overrides: Partial<Config> = {}): Promise<Config> {
-  let file: Partial<Config> = {};
+  let text: string | null = null;
   try {
-    file = JSON.parse(await readFile(CONFIG_FILE, "utf-8"));
+    text = await readFile(CONFIG_FILE, "utf-8");
   } catch {
-    file = {};
+    // no config file: defaults + CLI flags only
+  }
+  let file: Partial<Config> = {};
+  if (text !== null) {
+    try {
+      // Windows editors and PowerShell's Out-File may save a UTF-8 BOM, which JSON.parse rejects.
+      file = JSON.parse(text.replace(/^\uFEFF/, ""));
+    } catch (err) {
+      console.error(`[config] ${CONFIG_FILE} is not valid JSON: ${(err as Error).message}`);
+      process.exit(1);
+    }
   }
   const cleanOverrides = Object.fromEntries(
     Object.entries(overrides).filter(([, v]) => v !== undefined && v !== ""),

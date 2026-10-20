@@ -55,9 +55,14 @@ function extractBoolFlag(args: string[], name: string): boolean {
   return true;
 }
 
+/** Windows PowerShell prefixes piped text and `Out-File` output with a UTF-8 BOM; drop it so the first command/rule still parses. */
+function stripBom(text: string): string {
+  return text.replace(/^\uFEFF/, "");
+}
+
 /** `@path/to/file` reads the file; anything else is returned as-is. */
 async function readArg(value: string): Promise<string> {
-  if (value.startsWith("@")) return readFile(resolve(value.slice(1)), "utf-8");
+  if (value.startsWith("@")) return stripBom(await readFile(resolve(value.slice(1)), "utf-8"));
   return value;
 }
 
@@ -75,7 +80,7 @@ function readStdin(): Promise<string> {
     let data = "";
     process.stdin.setEncoding("utf-8");
     process.stdin.on("data", (chunk) => (data += chunk));
-    process.stdin.on("end", () => resolvePromise(data));
+    process.stdin.on("end", () => resolvePromise(stripBom(data)));
     process.stdin.on("error", reject);
   });
 }

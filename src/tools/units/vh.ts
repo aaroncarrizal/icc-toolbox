@@ -2,7 +2,7 @@ export {};
 const size = Number(process.argv[2]);
 
 if (isNaN(size)) {
-  console.error("Uso: npm run vh -- <tamaño>");
+  console.error("Usage: npm run vh -- <px>   (e.g. npm run vh -- 24)");
   process.exit(1);
 }
 

@@ -1,8 +1,11 @@
 {
   "name": "icc-toolbox",
   "version": "1.0.0",
-  "description": "ICC dealer-site toolbox: CSS injection with hot reload, live source toggling and a CDP debug CLI",
+  "description": "ICC dealer-site toolbox: live CSS injection with hot reload and a CDP debug CLI, px unit converters, and image convert/compress tools",
   "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "bin": {
     "icc-toolbox": "./dist/index.js"
   },
