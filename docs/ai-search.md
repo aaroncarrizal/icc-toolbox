@@ -49,7 +49,21 @@ Replace `{{PLACE EXISTING SITE HERO RV SEARCH SNIPPET HERE}}` with the dealer's 
 
 [`mobile-ai-button.html`](../snippets/ai-search-assistant/mobile-ai-button.html) only shows on phones and tablets (`visible-xs visible-sm`). Put it in the homepage content where the mobile AI entry point should appear.
 
-### 4. Paste into the CMS
+### 4. Open on the AI Search tab (optional)
+
+By default the hero opens on the **Filters** tab. To open on **AI Search** instead, paste [`ai-default-mode.html`](../snippets/ai-search-assistant/ai-default-mode.html) into the homepage's **Page Footer Scripts** (Developer tab):
+
+```html
+<script>
+  window.AISearchConfig.defaultSearchMode = 'ai';
+</script>
+```
+
+- It must run **after** the platform's `ai-search-cta.js`, which creates `window.AISearchConfig`. Page Footer Scripts render after it; anywhere earlier, the line throws `Cannot set properties of undefined`.
+- A visitor who picks a tab keeps their choice for the rest of the session.
+- Check it on the live homepage: `npm run dbg -- eval "window.AISearchConfig"` should return `{"defaultSearchMode":"ai"}`, and `<html>` should have the `search-mode-ai` class.
+
+### 5. Paste into the CMS
 
 Paste the markup in the editor's **source/HTML view**, so the macro holders arrive intact. Then check the live homepage with the injector running:
 
