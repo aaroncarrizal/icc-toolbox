@@ -329,6 +329,7 @@ When the user provides a numbered list of CSS fixes/features to apply to the tar
 |------|---------|
 | `ai-widget.html` | The hero shell template: two Umbraco macro-snippet placeholders sandwiching a `.collapse.home-hero-search` div with a `{{PLACE EXISTING SITE HERO RV SEARCH SNIPPET HERE}}` marker — paste the dealer's existing search form snippet into that marker when building the widget into a new hero. |
 | `mobile-ai-button.html` | A mobile-only (`visible-xs visible-sm`) macro-snippet holder for the AI widget's mobile entry point. |
+| `ai-default-mode.html` | Optional script for the homepage's Page Footer Scripts that makes the hero open on the AI Search tab (`window.AISearchConfig.defaultSearchMode = 'ai'`). Must run after the platform's `ai-search-cta.js`. |
 | `original-search.html` | Placeholder for the dealer's original (pre-AI-widget) search form snippet, for reference/rollback. Currently empty — fill it in per-dealer when doing this migration. |
 | `mobile-search-fixes.md` | CSS to make the header Search button open the mobile search panel (`.top-search-mobile`) on `/rv-search` and `/search-assistant`, and why each rule is needed. |
 
