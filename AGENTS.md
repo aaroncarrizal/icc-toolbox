@@ -311,6 +311,19 @@ When the user gives an old-site page URL and asks to create or migrate that page
 
 When the user shares an old-site URL that has the Kenect reviews/testimonials carousel and wants it on the new site, follow the skill in [.claude/skills/kenect-reviews/SKILL.md](.claude/skills/kenect-reviews/SKILL.md). In short: `curl` the old page and copy the `data-publicId` from the `reviews_widget.min.js` script, then hand the user two pieces: a loader script for the page's **Page Footer Scripts** (Developer tab), which appends the Kenect script into `#reviews-widget`, and a `<div id="reviews-widget">` container for the page content. The CMS doesn't allow scripts inside content. Preview by inserting both live with `dbg eval`, and add only section spacing in `home.css`.
 
+## Start a Build (`/start-build`)
+
+When the user gives a Figma link or a mockup image for a dealer that's already set up and asks to start the build, follow the skill in [.claude/skills/start-build/SKILL.md](.claude/skills/start-build/SKILL.md). In short:
+
+1. Copy the dealer's CMS snippets (Umbraco under `/rebraco`, read through the user's CMS session) and its `<id>_default.css` into `snippets/` and `styles/home.css`, and commit each.
+2. Read the mockup: Figma text styles and the Typography variables; never press Shift+D.
+3. Rewrite the snippets to match it.
+4. Publish the HTML to the CMS only after the user says yes, checking the impersonated account and each rendered macro.
+5. Replace the obsolete homepage CSS with new sections at the end of `home.css`.
+6. Refine type and layout at 375–1600 px.
+
+A planned `cms` tool ([specs/005-cms-sync/proposal.md](specs/005-cms-sync/proposal.md)) will replace the browser-driven pull and publish steps.
+
 ## List of Fixes Workflow
 
 When the user provides a numbered list of CSS fixes/features to apply to the target site:

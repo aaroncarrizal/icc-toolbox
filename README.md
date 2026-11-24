@@ -364,6 +364,7 @@ Every tool works by hand. The repo is also set up for [Claude Code](https://clau
 | Skill | Use it when |
 |---|---|
 | `/set-up <dealer> <url>` | Starting a new dealer: creates the branch and fills in `.cssinjector.json` (detects Basic Auth for you) |
+| `/start-build <figma-link or image>` | Starting a homepage build from a mockup: copies the CMS snippets and dealer CSS, rewrites the snippets to match, publishes them to the CMS (after you confirm) and styles `home.css` at every breakpoint |
 | `/custom-forms` | Building or changing a lead form (fields, `FormType`, redirect, lead email routing) |
 | `/content-migration <old-page-url>` | Moving a page from the dealer's old site into `snippets/pages/` |
 | `/kenect-reviews <old-page-url>` | Moving the Kenect reviews carousel from the old site |
